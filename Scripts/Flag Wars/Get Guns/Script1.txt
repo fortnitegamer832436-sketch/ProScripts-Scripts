@@ -1,0 +1,50 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+local backpack = LocalPlayer:WaitForChild("Backpack")
+
+local savedToolsFolder = ReplicatedStorage:FindFirstChild("SavedTools")
+if not savedToolsFolder then
+    savedToolsFolder = Instance.new("Folder")
+    savedToolsFolder.Name = "SavedTools"
+    savedToolsFolder.Parent = ReplicatedStorage
+end
+
+local function cloneTool(item)
+    local toolName = item.Name
+    local inBackpack = backpack:FindFirstChild(toolName)
+    local inCharacter = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild(toolName)
+
+    if not inBackpack and not inCharacter then
+        local clonedTool = item:Clone()
+        clonedTool.Parent = backpack
+    end
+
+    if not savedToolsFolder:FindFirstChild(toolName) then
+        local storageTool = item:Clone()
+        storageTool.Parent = savedToolsFolder
+    end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        local character = player.Character
+        if character then
+            for _, item in ipairs(character:GetChildren()) do
+                if item:IsA("Tool") then
+                    cloneTool(item)
+                end
+            end
+        end
+
+        local playerBackpack = player:FindFirstChild("Backpack")
+        if playerBackpack then
+            for _, item in ipairs(playerBackpack:GetChildren()) do
+                if item:IsA("Tool") then
+                    cloneTool(item)
+                end
+            end
+        end
+    end
+end
